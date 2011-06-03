@@ -4,7 +4,7 @@
 #include <time.h>
 #include <math.h>
 
-#define DEBUG true
+#define DEBUG 0
 #define SUBDIVISIONS 100
 #define RADIUS 0.05
 #define FRAMERATE 10
@@ -44,7 +44,6 @@ void renderSphere(float x, float y, float z, float radius, int subdivisions);
 void create_spheres(int n);
 void frame();
 void animate();
-float magnite(Vector v);
 
 Sphere spheres[1000];
 int spheres_count;
@@ -53,6 +52,7 @@ int main(int argc, char** argv)
 {
 	srand(time(NULL));
 	spheres_count = 0;
+
 	glutInit(&argc, argv);
 
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
@@ -69,7 +69,6 @@ int main(int argc, char** argv)
 	glutKeyboardFunc(keyboard_handler);
 	glutDisplayFunc(paint);
 	glutTimerFunc(FRAMERATE, frame, 0);
-	//glutMouseFunc(mouse);
 
 	create_spheres(10);
 
@@ -113,7 +112,7 @@ void paint()
 void renderSphere(float x, float y, float z, float radius, int subdivisions)
 {
 #if DEBUG
-	printf("x:%d; y:%d; z:%d\n", x, y, z);
+	printf("x:%f; y:%f; z:%f\n", x, y, z);
 #endif
 	glPushMatrix();
 	glTranslatef(x, y, z);
@@ -130,9 +129,9 @@ void create_spheres(int n)
 		sphere.pos.x = (float) rand() / RAND_MAX;
 		sphere.pos.y = (float) rand() / RAND_MAX;
     sphere.pos.z = (float) rand() / RAND_MAX;
-		sphere.velocity.x = -0.01;//(float) rand() / RAND_MAX;
-		sphere.velocity.y = 0.02;//(float) rand() / RAND_MAX;
-    sphere.velocity.z = 0.01;//(float) rand() / RAND_MAX;
+		sphere.velocity.x = (float) rand() / RAND_MAX * (rand() % 2 == 0 ? 1 : -1);
+		sphere.velocity.y = (float) rand() / RAND_MAX * (rand() % 2 == 0 ? 1 : -1);
+    sphere.velocity.z = (float) rand() / RAND_MAX * (rand() % 2 == 0 ? 1 : -1);
 		sphere.radius = RADIUS;
 		switch (i % 3)
 		{
