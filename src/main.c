@@ -40,8 +40,7 @@ Color blue =
 
 void paint();
 void keyboard_handler(unsigned char c, int x, int y);
-void renderSphere(float x, float y, float z, float radius, int subdivisions,
-		GLUquadricObj *quadric);
+void renderSphere(float x, float y, float z, float radius, int subdivisions);
 void create_spheres(int n);
 void frame();
 void animate();
@@ -100,30 +99,25 @@ void paint()
   animate();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	GLUquadricObj *quadric = gluNewQuadric();
-	gluQuadricNormals(quadric, GLU_SMOOTH);
-
 	int i;
 	for (i = 0; i < spheres_count; ++i)
 	{
 		glColor3f(spheres[i].color.r, spheres[i].color.g, spheres[i].color.b);
 		renderSphere(spheres[i].pos.x, spheres[i].pos.y, spheres[i].pos.z,
-				spheres[i].radius, SUBDIVISIONS, quadric);
+				spheres[i].radius, SUBDIVISIONS);
 	}
-	gluDeleteQuadric(quadric);
 
 	glutSwapBuffers();
 }
 
-void renderSphere(float x, float y, float z, float radius, int subdivisions,
-		GLUquadricObj *quadric)
+void renderSphere(float x, float y, float z, float radius, int subdivisions)
 {
 #if DEBUG
 	printf("x:%d; y:%d; z:%d\n", x, y, z);
 #endif
 	glPushMatrix();
 	glTranslatef(x, y, z);
-	gluSphere(quadric, radius, subdivisions, subdivisions);
+	glutSolidSphere(radius, subdivisions, subdivisions);
 	glPopMatrix();
 }
 
