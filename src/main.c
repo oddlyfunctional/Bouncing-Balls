@@ -2,6 +2,7 @@
 #include <GL/glu.h>
 #include <GL/glut.h>
 #include <time.h>
+#include <math.h>
 
 #define DEBUG true
 #define SUBDIVISIONS 100
@@ -43,6 +44,8 @@ void renderSphere(float x, float y, float z, float radius, int subdivisions,
 		GLUquadricObj *quadric);
 void create_spheres(int n);
 void frame();
+void animate();
+float magnite(Vector v);
 
 Sphere spheres[1000];
 int spheres_count;
@@ -56,7 +59,7 @@ int main(int argc, char** argv)
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(800, 800);
 	glutInitWindowPosition(0, 0);
-	glutCreateWindow(argv[0]);
+	glutCreateWindow("Bouncing Balls");
 
 #if DEBUG
 	glClearColor(1.0, 0.167, 1.0, 1.0);
@@ -69,7 +72,7 @@ int main(int argc, char** argv)
 	glutTimerFunc(FRAMERATE, frame, 0);
 	//glutMouseFunc(mouse);
 
-	create_spheres(3);
+	create_spheres(10);
 
 	glutMainLoop();
 
@@ -94,6 +97,7 @@ void keyboard_handler(unsigned char c, int x, int y)
 
 void paint()
 {
+  animate();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	GLUquadricObj *quadric = gluNewQuadric();
@@ -115,7 +119,7 @@ void renderSphere(float x, float y, float z, float radius, int subdivisions,
 		GLUquadricObj *quadric)
 {
 #if DEBUG
-	//	printf("x:%d; y:%d; z:%d\n", x, y, z);
+	printf("x:%d; y:%d; z:%d\n", x, y, z);
 #endif
 	glPushMatrix();
 	glTranslatef(x, y, z);
@@ -129,9 +133,12 @@ void create_spheres(int n)
 	for (i = 0; i < n; i++)
 	{
 		Sphere sphere;
-		sphere.pos.x = 0;//(float) rand() / RAND_MAX;
+		sphere.pos.x = (float) rand() / RAND_MAX;
 		sphere.pos.y = (float) rand() / RAND_MAX;
-		sphere.pos.z = (float) rand() / RAND_MAX;
+    sphere.pos.z = (float) rand() / RAND_MAX;
+		sphere.velocity.x = -0.01;//(float) rand() / RAND_MAX;
+		sphere.velocity.y = 0.02;//(float) rand() / RAND_MAX;
+    sphere.velocity.z = 0.01;//(float) rand() / RAND_MAX;
 		sphere.radius = RADIUS;
 		switch (i % 3)
 		{
@@ -148,3 +155,14 @@ void create_spheres(int n)
 		spheres[spheres_count++] = sphere;
 	}
 }
+
+void animate(){
+  int i;
+  for(i = 0; i < spheres_count; i++){
+    Sphere *s = &spheres[i];
+    s->pos.x += s->velocity.x;
+    s->pos.y += s->velocity.y;
+    s->pos.z += s->velocity.z;
+  }
+}
+
