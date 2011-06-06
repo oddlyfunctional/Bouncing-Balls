@@ -4,7 +4,6 @@
 #include <time.h>
 #include <math.h>
 
-#define DEBUG 0
 #define SUBDIVISIONS 16
 #define RADIUS 0.05
 #define FRAMERATE 10
@@ -154,7 +153,7 @@ void init(void)
 {
    GLfloat mat_ambient[] = { 1.0, 1.0, 1.0, 1.0 };
    GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-   GLfloat light_position[] = { 0.0, 0.0, 10.0, 1.0 };
+   GLfloat light_position[] = { 5.0, 5.0, 10.0, 1.0 };
    GLfloat lm_ambient[] = { 0.2, 0.2, 0.2, 1.0 };
 
    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
@@ -169,7 +168,6 @@ void init(void)
    glShadeModel (GL_FLAT);
 
    glClearColor(0.0, 0.0, 0.0, 0.0);
-   glClearAccum(0.0, 0.0, 0.0, 0.0);
 }
 
 void render_objects(void)
@@ -189,7 +187,6 @@ void render_objects(void)
 	{
 
     glPushMatrix ();
-
     GLfloat sphere_diffuse[] = { spheres[i].color.r, spheres[i].color.g, spheres[i].color.b };
     glTranslatef (spheres[i].pos.x, spheres[i].pos.y, spheres[i].pos.z);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, sphere_diffuse);
