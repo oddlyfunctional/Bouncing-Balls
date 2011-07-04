@@ -7,9 +7,16 @@
 #define SUBDIVISIONS 16
 #define RADIUS 0.05
 #define FRAMERATE 10
-#define MAX_VELOCITY 2
+#define MAX_VELOCITY 100
 #define MAX_SPHERES 1000
 #define SPAWN_RATE 0.1
+
+#define BOX_NEAR -2.0
+#define BOX_FAR -4.0
+#define BOX_LEFT -1.0
+#define BOX_RIGHT 1.0
+#define BOX_TOP -1.0
+#define BOX_BOTTOM 1.0
 
 typedef struct
 {
@@ -33,27 +40,28 @@ typedef struct
 	Color color;
 } Sphere;
 
-Color red =
-{ 1.0, 0.0, 0.0 };
-Color green =
-{ 0.0, 1.0, 0.0 };
-Color blue =
-{ 0.0, 0.0, 1.0 };
+Color red = { 1.0, 0.0, 0.0 };
+Color green = { 0.0, 1.0, 0.0 };
+Color blue = { 0.0, 0.0, 1.0 };
 
 void keyboard_handler(unsigned char c, int x, int y);
 void create_spheres(int n);
 void move_objects();
-float rand_position();
+float rand_position(char axis);
 float rand_velocity();
 void collision(Sphere *s);
 void reshape();
 void init(void);
 void render_scene(void);
 void render_objects(void);
-void frame(int id);
+void frame(void);
+void set_delta_time(void);
 
 Sphere spheres[1000];
 int spheres_count;
+
+float delta_time;
+float current_time;
 
 
 void keyboard_handler(unsigned char c, int x, int y)
@@ -75,8 +83,26 @@ void keyboard_handler(unsigned char c, int x, int y)
 	}
 }
 
-float rand_position(){
-  return (float) rand() / RAND_MAX * (rand() % 2 == 0 ? 1 : -1);
+float rand_position(char axis){
+  if (axis == 'x') {
+    if (rand() % 2 == 0){
+      return (float) rand() / RAND_MAX + BOX_LEFT;
+    } else {
+      return (float) -rand() / RAND_MAX + BOX_RIGHT;
+    }
+  } else if (axis == 'y') {
+    if (rand() % 2 == 0){
+      return (float) rand() / RAND_MAX + BOX_TOP;
+    } else {
+      return (float) -rand() / RAND_MAX + BOX_BOTTOM;
+    }
+  } else if (axis == 'z') {
+    if (rand() % 2 == 0){
+      return (float) -rand() / RAND_MAX + BOX_NEAR;
+    } else {
+      return (float) rand() / RAND_MAX + BOX_FAR;
+    }
+  }
 }
 
 float rand_velocity(){
@@ -90,17 +116,17 @@ void create_spheres(int n)
 	for (i = 0; i < n && spheres_count + 1 < MAX_SPHERES; i++)
 	{
 		Sphere sphere;
-		sphere.pos.x = rand_position();
-		sphere.pos.y = rand_position();
-    sphere.pos.z = rand_position();
+		sphere.pos.x = rand_position('x');
+		sphere.pos.y = rand_position('y');
+    sphere.pos.z = rand_position('z');
 		sphere.radius = RADIUS;
 
-    if (sphere.pos.x - sphere.radius < -1.0) sphere.pos.x = -1.0 + sphere.radius;
-    else if (sphere.pos.x + sphere.radius > 1.0) sphere.pos.x = 1.0 - sphere.radius;
-    if (sphere.pos.y - sphere.radius < -1.0) sphere.pos.y = -1.0 + sphere.radius;
-    else if (sphere.pos.y + sphere.radius > 1.0) sphere.pos.y = 1.0 - sphere.radius;
-    if (sphere.pos.z - sphere.radius < -1.0) sphere.pos.z = -1.0 + sphere.radius;
-    else if (sphere.pos.z + sphere.radius > 1.0) sphere.pos.z = 1.0 - sphere.radius;
+    if (sphere.pos.x - sphere.radius < BOX_LEFT) sphere.pos.x = BOX_LEFT + sphere.radius;
+    else if (sphere.pos.x + sphere.radius > BOX_RIGHT) sphere.pos.x = BOX_RIGHT - sphere.radius;
+    if (sphere.pos.y - sphere.radius < BOX_TOP) sphere.pos.y = BOX_TOP + sphere.radius;
+    else if (sphere.pos.y + sphere.radius > BOX_BOTTOM) sphere.pos.y = BOX_BOTTOM - sphere.radius;
+    if (sphere.pos.z - sphere.radius < BOX_NEAR) sphere.pos.z = BOX_NEAR - sphere.radius;
+    else if (sphere.pos.z + sphere.radius > BOX_FAR) sphere.pos.z = BOX_FAR + sphere.radius;
 
 		sphere.velocity.x = rand_velocity();
 		sphere.velocity.y = rand_velocity();
@@ -126,25 +152,25 @@ void move_objects(){
   for(i = 0; i < spheres_count; i++){
     Sphere *s = &spheres[i];
     collision(s);
-    s->pos.x += s->velocity.x;
-    s->pos.y += s->velocity.y;
-    s->pos.z += s->velocity.z;
+    s->pos.x += s->velocity.x * delta_time;
+    s->pos.y += s->velocity.y * delta_time;
+    s->pos.z += s->velocity.z * delta_time;
   }
 }
 
 void collision(Sphere *s){
   Vector *v = &s->velocity;
   Vector *pos = &s->pos;
-  if (pos->x + v->x - s->radius < -1.0 ||
-      pos->x + v->x + s->radius > 1.0){
+  if (pos->x + v->x * delta_time - s->radius < BOX_LEFT ||
+      pos->x + v->x * delta_time + s->radius > BOX_RIGHT){
     v->x *= -1;
   }
-  if (pos->y + v->y - s->radius < -1.0 ||
-      pos->y + v->y + s->radius > 1.0){
+  if (pos->y + v->y * delta_time - s->radius < BOX_TOP ||
+      pos->y + v->y * delta_time + s->radius > BOX_BOTTOM){
     v->y *= -1;
   }
-  if (pos->z + v->z - s->radius < -1.0 ||
-      pos->z + v->z + s->radius > 1.0){
+  if (pos->z + v->z * delta_time - s->radius < BOX_FAR ||
+      pos->z + v->z * delta_time + s->radius > BOX_NEAR){
     v->z *= -1;
   }
 }
@@ -168,24 +194,26 @@ void init(void)
    glShadeModel (GL_FLAT);
 
    glClearColor(0.0, 0.0, 0.0, 0.0);
+
+   glutReshapeFunc(reshape);
+   glutDisplayFunc(render_scene);
+   glutKeyboardFunc(keyboard_handler);
+
+	 create_spheres(10);
+
+   glutIdleFunc(frame);
 }
 
 void render_objects(void)
 {
 
-   glPushMatrix ();
-
-   glMatrixMode(GL_PROJECTION);
-/*   glRotatef (40.0, 0.5, 0.5, 0.5);*/
-  gluPerspective(65.0, 1.0, 1.2, 1000);
-
+/*   glPushMatrix ();*/
 
   move_objects();
 
 	int i;
 	for (i = 0; i < spheres_count; ++i)
 	{
-
     glPushMatrix ();
     GLfloat sphere_diffuse[] = { spheres[i].color.r, spheres[i].color.g, spheres[i].color.b };
     glTranslatef (spheres[i].pos.x, spheres[i].pos.y, spheres[i].pos.z);
@@ -194,17 +222,20 @@ void render_objects(void)
     glPopMatrix ();
 	}
 
-   glPopMatrix ();
+/*   glPopMatrix ();*/
 }
 
 
 void render_scene(void)
 {
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      glPushMatrix ();
+/*      glPushMatrix ();*/
+
+      glLoadIdentity();
 
       render_objects();
-      glPopMatrix();
+
+/*      glPopMatrix();*/
       glutSwapBuffers();
 }
 
@@ -213,24 +244,35 @@ void reshape(int w, int h)
    glViewport(0, 0, (GLsizei) w, (GLsizei) h);
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
-   if (w <= h)
-      glOrtho (-2.0, 2.0, -2.0*h/w, 2.0*h/w, -10.0, 10.0);
-   else
-      glOrtho (-2.0*w/h, 2.0*w/h, -2.0, 2.0, -10.0, 10.0);
+   if (w <= h) {
+      gluPerspective(65.0f, h/w, -BOX_NEAR, -BOX_FAR);
+/*      glOrtho (-2.0, 2.0, -2.0*h/w, 2.0*h/w, -10.0, 10.0);*/
+   } else {
+/*    glOrtho (-2.0*w/h, 2.0*w/h, -2.0, 2.0, -10.0, 10.0);*/
+      gluPerspective(65.0f, w/h, -BOX_NEAR, -BOX_FAR);
+  }
    glMatrixMode(GL_MODELVIEW);
-   glLoadIdentity();
+//   glLoadIdentity();
 }
 
 
-void frame(int id){
+void frame(){
+  set_delta_time();
 	glutPostRedisplay();
-	glutTimerFunc(FRAMERATE, frame, id);
+}
+
+void set_delta_time(){
+  float previous_time = current_time;
+  current_time = glutGet(GLUT_ELAPSED_TIME);
+  delta_time = (current_time - previous_time) / 1000;
 }
 
 int main(int argc, char** argv)
 {
 	 srand(time(NULL));
 	 spheres_count = 0;
+	 delta_time = 0;
+	 current_time = 0;
 
    glutInit(&argc, argv);
    glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH );
@@ -238,14 +280,7 @@ int main(int argc, char** argv)
    glutInitWindowPosition (100, 100);
    glutCreateWindow (argv[0]);
    init();
-   glutReshapeFunc(reshape);
-   glutDisplayFunc(render_scene);
-   glutKeyboardFunc(keyboard_handler);
 
-
-	 create_spheres(10);
-
-   glutTimerFunc(FRAMERATE, frame, 0);
    glutMainLoop();
    return 0;
 }
