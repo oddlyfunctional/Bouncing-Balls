@@ -1,3 +1,5 @@
+/* Desenvolvimento teste de física de corpos rígidos */
+
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
