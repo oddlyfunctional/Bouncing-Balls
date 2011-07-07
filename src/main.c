@@ -20,6 +20,9 @@
 #define BOX_TOP -1.0
 #define BOX_BOTTOM 1.0
 
+#define CELLS_PER_SIDE 4
+#define CELL_SIZE 0.5
+
 typedef struct
 {
 	float x;
@@ -47,9 +50,9 @@ Color green = { 0.0, 1.0, 0.0 };
 Color blue = { 0.0, 0.0, 1.0 };
 
 void keyboard_handler(unsigned char c, int x, int y);
-void create_spheres(int n);
+void create_spheres();
 void move_objects();
-float rand_position(char axis);
+/*float rand_position(char axis);*/
 float rand_velocity();
 void collision(Sphere *s);
 void reshape();
@@ -74,6 +77,8 @@ void keyboard_handler(unsigned char c, int x, int y)
 	case 27:
 		exit(0);
 		break;
+  /* Desativação dos comandos para criação de novas esferas
+
   case '+':
     create_spheres(1 + spheres_count * SPAWN_RATE);
     break;
@@ -82,70 +87,80 @@ void keyboard_handler(unsigned char c, int x, int y)
     spheres_count = spheres_count - spheres_count * SPAWN_RATE < 1 ?
                     0 : (int) spheres_count - spheres_count * SPAWN_RATE;
     break;
+  */
 	}
 }
 
-float rand_position(char axis){
-  if (axis == 'x') {
-    if (rand() % 2 == 0){
-      return (float) rand() / RAND_MAX + BOX_LEFT;
-    } else {
-      return (float) -rand() / RAND_MAX + BOX_RIGHT;
-    }
-  } else if (axis == 'y') {
-    if (rand() % 2 == 0){
-      return (float) rand() / RAND_MAX + BOX_TOP;
-    } else {
-      return (float) -rand() / RAND_MAX + BOX_BOTTOM;
-    }
-  } else if (axis == 'z') {
-    if (rand() % 2 == 0){
-      return (float) -rand() / RAND_MAX + BOX_NEAR;
-    } else {
-      return (float) rand() / RAND_MAX + BOX_FAR;
-    }
-  }
-}
+/*float rand_position(char axis){*/
+/*  if (axis == 'x') {*/
+/*    if (rand() % 2 == 0){*/
+/*      return (float) rand() / RAND_MAX + BOX_LEFT;*/
+/*    } else {*/
+/*      return (float) -rand() / RAND_MAX + BOX_RIGHT;*/
+/*    }*/
+/*  } else if (axis == 'y') {*/
+/*    if (rand() % 2 == 0){*/
+/*      return (float) rand() / RAND_MAX + BOX_TOP;*/
+/*    } else {*/
+/*      return (float) -rand() / RAND_MAX + BOX_BOTTOM;*/
+/*    }*/
+/*  } else if (axis == 'z') {*/
+/*    if (rand() % 2 == 0){*/
+/*      return (float) -rand() / RAND_MAX + BOX_NEAR;*/
+/*    } else {*/
+/*      return (float) rand() / RAND_MAX + BOX_FAR;*/
+/*    }*/
+/*  }*/
+/*}*/
 
 float rand_velocity(){
   return 0.01 + 0.01 * (rand() % MAX_VELOCITY) ;
 }
 
 
-void create_spheres(int n)
+void create_spheres()
 {
-	int i;
-	for (i = 0; i < n && spheres_count + 1 < MAX_SPHERES; i++)
+	int x;
+	for (x = 0; x < CELLS_PER_SIDE; x++)
 	{
-		Sphere sphere;
-		sphere.pos.x = rand_position('x');
-		sphere.pos.y = rand_position('y');
-    sphere.pos.z = rand_position('z');
-		sphere.radius = RADIUS;
+	  int y;
+	  for (y = 0; y < CELLS_PER_SIDE; y++)
+	  {
+  	  int z;
+	    for (z = 0; z < CELLS_PER_SIDE; z++)
+	    {
+	      Sphere sphere;
+        sphere.pos.x = BOX_LEFT + x * CELL_SIZE;
+        sphere.pos.y = BOX_TOP + y * CELL_SIZE;
+        sphere.pos.z = BOX_FAR + z * CELL_SIZE;
+        sphere.radius = RADIUS;
 
-    if (sphere.pos.x - sphere.radius < BOX_LEFT) sphere.pos.x = BOX_LEFT + sphere.radius;
-    else if (sphere.pos.x + sphere.radius > BOX_RIGHT) sphere.pos.x = BOX_RIGHT - sphere.radius;
-    if (sphere.pos.y - sphere.radius < BOX_TOP) sphere.pos.y = BOX_TOP + sphere.radius;
-    else if (sphere.pos.y + sphere.radius > BOX_BOTTOM) sphere.pos.y = BOX_BOTTOM - sphere.radius;
-    if (sphere.pos.z - sphere.radius < BOX_NEAR) sphere.pos.z = BOX_NEAR - sphere.radius;
-    else if (sphere.pos.z + sphere.radius > BOX_FAR) sphere.pos.z = BOX_FAR + sphere.radius;
+        if (sphere.pos.x - sphere.radius < BOX_LEFT) sphere.pos.x = BOX_LEFT + sphere.radius;
+        else if (sphere.pos.x + sphere.radius > BOX_RIGHT) sphere.pos.x = BOX_RIGHT - sphere.radius;
+        if (sphere.pos.y - sphere.radius < BOX_TOP) sphere.pos.y = BOX_TOP + sphere.radius;
+        else if (sphere.pos.y + sphere.radius > BOX_BOTTOM) sphere.pos.y = BOX_BOTTOM - sphere.radius;
+        if (sphere.pos.z - sphere.radius < BOX_NEAR) sphere.pos.z = BOX_NEAR - sphere.radius;
+        else if (sphere.pos.z + sphere.radius > BOX_FAR) sphere.pos.z = BOX_FAR + sphere.radius;
 
-		sphere.velocity.x = rand_velocity();
-		sphere.velocity.y = rand_velocity();
-    sphere.velocity.z = rand_velocity();
-		switch (rand() % 3)
-		{
-		case 0:
-			sphere.color = red;
-			break;
-		case 1:
-			sphere.color = green;
-			break;
-		case 2:
-			sphere.color = blue;
-			break;
-		}
-		spheres[spheres_count++] = sphere;
+    		sphere.velocity.x = rand_velocity();
+    		sphere.velocity.y = rand_velocity();
+        sphere.velocity.z = rand_velocity();
+
+    		switch (rand() % 3)
+		    {
+    		case 0:
+    			sphere.color = red;
+			    break;
+      		case 1:
+    			sphere.color = green;
+    			break;
+    		case 2:
+			    sphere.color = blue;
+    			break;
+    		}
+    		spheres[spheres_count++] = sphere;
+	    }
+	  }
 	}
 }
 
@@ -201,7 +216,7 @@ void init(void)
    glutDisplayFunc(render_scene);
    glutKeyboardFunc(keyboard_handler);
 
-	 create_spheres(10);
+	 create_spheres();
 
    glutIdleFunc(frame);
 }
