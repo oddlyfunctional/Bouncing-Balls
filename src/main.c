@@ -250,9 +250,9 @@ void init_cells()
 }
 
 Cell * get_cell(Sphere *s){
-  int x = CELL_SIZE * CELLS_PER_SIDE * s->pos.x + (-BOX_LEFT);
-  int y = CELL_SIZE * CELLS_PER_SIDE * s->pos.y + (-BOX_TOP);
-  int z = CELL_SIZE * CELLS_PER_SIDE * s->pos.z + (-BOX_FAR);
+  int x = CELL_SIZE * CELLS_PER_SIDE * fabs(s->pos.x + (-BOX_LEFT));
+  int y = CELL_SIZE * CELLS_PER_SIDE * fabs(s->pos.y + (-BOX_TOP));
+  int z = CELL_SIZE * CELLS_PER_SIDE * fabs(s->pos.z + (-BOX_FAR));
 
   return &cells[x][y][z];
 }
@@ -442,9 +442,9 @@ void spheres_collision(Sphere *s){
 
   /* Colisão por grid a partir daqui */
 
-  int x = CELL_SIZE * CELLS_PER_SIDE * s->pos.x + (-BOX_LEFT);
-  int y = CELL_SIZE * CELLS_PER_SIDE * s->pos.y + (-BOX_TOP);
-  int z = CELL_SIZE * CELLS_PER_SIDE * s->pos.z + (-BOX_FAR);
+  int x = CELL_SIZE * CELLS_PER_SIDE * fabs(s->pos.x + (-BOX_LEFT));
+  int y = CELL_SIZE * CELLS_PER_SIDE * fabs(s->pos.y + (-BOX_TOP));
+  int z = CELL_SIZE * CELLS_PER_SIDE * fabs(s->pos.z + (-BOX_FAR));
 
   Cell *cell = &cells[x][y][z];
   in_cell_collision(cell, s);
