@@ -192,47 +192,60 @@ void init_cells()
 	    }
 	  }
 	}
-/*  int i;*/
-/*  for(i=0; i< 4; i++){*/
-/*    int j;*/
-/*    for(j=0; j<4; j++){*/
-/*    int k;*/
-/*    for(k=0; k < 4; k++){*/
-/*    	Sphere s;*/
-/*    	s.pos.x = BOX_LEFT + i * CELL_SIZE;*/
-/*    	s.pos.y = BOX_TOP + j * CELL_SIZE;*/
-/*    	s.pos.z = BOX_FAR + k * CELL_SIZE;*/
-/*    	s.velocity.x = rand_velocity();*/
-/*    	s.velocity.y = rand_velocity();*/
-/*	    s.velocity.z = rand_velocity();*/
-/*    	s.color = red;*/
-/*	    s.radius = RADIUS;*/
+  int i;
+  for(i=0; i< 4; i++){
+    int j;
+    for(j=0; j<4; j++){
+    int k;
+    for(k=0; k < 4; k++){
+    	Sphere s;
+    	s.pos.x = BOX_LEFT + i * CELL_SIZE;
+    	s.pos.y = BOX_TOP + j * CELL_SIZE;
+    	s.pos.z = BOX_FAR + k * CELL_SIZE;
+    	s.velocity.x = rand_velocity();
+    	s.velocity.y = rand_velocity();
+	    s.velocity.z = rand_velocity();
+    	s.color = red;
+	    s.radius = RADIUS;
+    		switch (rand() % 3)
+		    {
+    		case 0:
+    			s.color = red;
+			    break;
+      		case 1:
+    			s.color = green;
+    			break;
+    		case 2:
+			    s.color = blue;
+    			break;
+    		}
+    	spheres[spheres_count++] = s;
+    }}
+  }
 
-/*    	spheres[spheres_count++] = s;*/
-/*    }}*/
-/*  }*/
 
-  Sphere s;
-  s.radius = RADIUS;
-  s.pos.x = BOX_LEFT + 1.0f;
-  s.pos.y = BOX_TOP + 1.5f;
-  s.pos.z = BOX_FAR + 1.0f;
-  s.velocity.x = 0.5f;
-  s.velocity.y = -0.9f;
-  s.velocity.z = 0.0f;
-  s.color = red;
-  spheres[spheres_count++] = s;
+/* Colisão entre duas partículas */
+/*  Sphere s;*/
+/*  s.radius = RADIUS;*/
+/*  s.pos.x = BOX_LEFT + 1.0f;*/
+/*  s.pos.y = BOX_TOP + 1.5f;*/
+/*  s.pos.z = BOX_FAR + 1.0f;*/
+/*  s.velocity.x = 0.5f;*/
+/*  s.velocity.y = -0.9f;*/
+/*  s.velocity.z = 0.0f;*/
+/*  s.color = red;*/
+/*  spheres[spheres_count++] = s;*/
 
-  Sphere s2;
-  s2.radius = RADIUS;
-  s2.pos.x = BOX_LEFT + 1.5f;
-  s2.pos.y = BOX_TOP + 1.0f;
-  s2.pos.z = BOX_FAR + 1.0f;
-  s2.velocity.x = -0.5f;
-  s2.velocity.y = 0.0f;
-  s2.velocity.z = 0.0f;
-  s2.color = blue;
-  spheres[spheres_count++] = s2;
+/*  Sphere s2;*/
+/*  s2.radius = RADIUS;*/
+/*  s2.pos.x = BOX_LEFT + 1.5f;*/
+/*  s2.pos.y = BOX_TOP + 1.0f;*/
+/*  s2.pos.z = BOX_FAR + 1.0f;*/
+/*  s2.velocity.x = -0.5f;*/
+/*  s2.velocity.y = 0.0f;*/
+/*  s2.velocity.z = 0.0f;*/
+/*  s2.color = blue;*/
+/*  spheres[spheres_count++] = s2;*/
 }
 
 Cell * get_cell(Sphere *s){
