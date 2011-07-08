@@ -220,6 +220,7 @@ void init_cells()
     			break;
     		}
     	spheres[spheres_count++] = s;
+    	add_to_cell(&s);
     }}
   }
 
@@ -424,16 +425,16 @@ void in_cell_collision(Cell *cell, Sphere *s){
 void spheres_collision(Sphere *s){
 
 /* Testando método óbvio */
-  int i;
-  for (i = 0; i < spheres_count; i++) {
-    int j;
-    for (j = 0; j < spheres_count; j++) {
-      if (i != j) {
-        sphere_sphere_collision(&spheres[i], &spheres[j]);
-      }
-    }
-  }
-  return;
+/*  int i;*/
+/*  for (i = 0; i < spheres_count; i++) {*/
+/*    int j;*/
+/*    for (j = 0; j < spheres_count; j++) {*/
+/*      if (i != j) {*/
+/*        sphere_sphere_collision(&spheres[i], &spheres[j]);*/
+/*      }*/
+/*    }*/
+/*  }*/
+/*  return;*/
 
   /* Colisão por grid a partir daqui */
 
