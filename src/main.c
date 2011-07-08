@@ -1,4 +1,4 @@
-/* Desenvolvimento teste de física de corpos rígidos */
+/* Desenvolvimento de collision grid */
 
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -250,9 +250,9 @@ void init_cells()
 }
 
 Cell * get_cell(Sphere *s){
-  int x = CELL_SIZE * CELLS_PER_SIDE * s->pos.x;
-  int y = CELL_SIZE * CELLS_PER_SIDE * s->pos.y;
-  int z = CELL_SIZE * CELLS_PER_SIDE * s->pos.z;
+  int x = CELL_SIZE * CELLS_PER_SIDE * s->pos.x + (-BOX_LEFT);
+  int y = CELL_SIZE * CELLS_PER_SIDE * s->pos.y + (-BOX_TOP);
+  int z = CELL_SIZE * CELLS_PER_SIDE * s->pos.z + (-BOX_FAR);
 
   return &cells[x][y][z];
 }
@@ -288,11 +288,14 @@ void remove_from_cell(Sphere *s){
 void add_to_cell(Sphere *s){
   Cell *cell = get_cell(s);
   int pos = find_sphere_in_cell(NULL, cell);
+  printf("%d\n", pos);
   if (pos != -1) {
     cell->spheres[pos] = s;
     if (pos == cell->num) {
       cell->num++;
     }
+  } else {
+    cell->spheres[cell->num++] = s;
   }
 }
 
@@ -368,7 +371,7 @@ Vector multiplicate_v_e(Vector *v, float e) {
 }
 
 void sphere_sphere_collision(Sphere *s1, Sphere *s2){
-
+printf("testando colisão");
 Vector s = subtract_v(&s1->pos, &s2->pos);
     Vector v = subtract_v(&s1->velocity, &s2->velocity);
 
@@ -414,6 +417,7 @@ Vector s = subtract_v(&s1->pos, &s2->pos);
 void in_cell_collision(Cell *cell, Sphere *s){
   Vector *v = &s->velocity;
   Vector *pos = &s->pos;
+/*  printf("%d\n",cell->num);*/
   int i;
   for (i = 0; i < cell->num; i++){
     if(s != cell->spheres[i]) {
@@ -438,9 +442,9 @@ void spheres_collision(Sphere *s){
 
   /* Colisão por grid a partir daqui */
 
-  int x = CELL_SIZE * CELLS_PER_SIDE * s->pos.x;
-  int y = CELL_SIZE * CELLS_PER_SIDE * s->pos.y;
-  int z = CELL_SIZE * CELLS_PER_SIDE * s->pos.z;
+  int x = CELL_SIZE * CELLS_PER_SIDE * s->pos.x + (-BOX_LEFT);
+  int y = CELL_SIZE * CELLS_PER_SIDE * s->pos.y + (-BOX_TOP);
+  int z = CELL_SIZE * CELLS_PER_SIDE * s->pos.z + (-BOX_FAR);
 
   Cell *cell = &cells[x][y][z];
   in_cell_collision(cell, s);
