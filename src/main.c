@@ -299,7 +299,6 @@ void move_objects(){
   int i;
   for(i = 0; i < spheres_count; i++){
     Sphere *s = &spheres[i];
-/*    printf("%p:%f,%f,%f\n", s, s->velocity.x, s->velocity.y, s->velocity.z);*/
     collision(s);
     remove_from_cell(s);
     s->pos.x += s->velocity.x * delta_time;
@@ -368,38 +367,28 @@ Vector multiplicate_v_e(Vector *v, float e) {
 }
 
 void sphere_sphere_collision(Sphere *s1, Sphere *s2){
-/*  Vector vel1 = multiplicate_v_e(&s1->velocity, delta_time);*/
-/*  Vector vel2 = multiplicate_v_e(&s2->velocity, delta_time);*/
-/*  Vector pos1 = add_v(&s1->pos, &vel1);*/
-/*  Vector pos2 = add_v(&s2->pos, &vel2);*/
-/*  Vector distance = subtract_v(&pos1, &pos2);*/
-/*printf("%f\n", magnitude_v(&distance));*/
 
-Vector s = subtract_v(&s1->pos, &s2->pos); // vector between the centers of each sphere
-    Vector v = subtract_v(&s1->velocity, &s2->velocity); // relative velocity between spheres
+Vector s = subtract_v(&s1->pos, &s2->pos);
+    Vector v = subtract_v(&s1->velocity, &s2->velocity);
 
     float r = s1->radius + s2->radius;
-    float c1 = dot_v(&s, &s) - r*r; // if negative, they overlap
+    float c1 = dot_v(&s, &s) - r*r;
 
     float a1 = dot_v(&v,&v);
     if (a1 < 0.0001f)
-        return; // does not move towards each other
+        return;
 
     float b1 = dot_v(&v,&s);
     if (b1 >= 0.0)
-        return ; // does not move towards each other
+        return ;
 
     float d1 = b1*b1 - a1*c1;
     if (d1 < 0.0)
-        return ; // no real roots ... no collision
+        return ;
 
 
     if (c1 > 0.0)
       return;
-
-/*  if (magnitude_v(&distance) < s1->radius + s2->radius) {*/
-
-/*  printf("Colidindo: %p, %p\n", s1, s2);*/
 
     Vector x = subtract_v(&s1->pos, &s2->pos);
     x = normalize_v(&x);
@@ -417,11 +406,8 @@ Vector s = subtract_v(&s1->pos, &s2->pos); // vector between the centers of each
     Vector v2y = subtract_v(&v2, &v2x);
     float m2 = s2->radius;
 
-/*    printf("%p: %f,%f,%f\n", s1, s1->velocity.x, s1->velocity.y, s1->velocity.z);*/
     s1->velocity = add_v(&v2x, &v1y);
     s2->velocity = add_v(&v1x, &v2y);
-/*        printf("%p: %f,%f,%f\n\n", s1, s1->velocity.x, s1->velocity.y, s1->velocity.z);*/
-/*  }*/
 }
 
 void in_cell_collision(Cell *cell, Sphere *s){
